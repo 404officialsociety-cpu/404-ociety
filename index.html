@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>404 Society — Quiet Luxury Essentials</title>
+<meta name="description" content="Considered essentials, cut with intent. Complimentary delivery across India.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f5;--fg:#141414;--mut:#8a8478;--ln:#e5e0d8;--card:#f1ede6;--gold:#a08a5b}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:300 15px/1.6 Jost,system-ui,sans-serif;letter-spacing:.02em}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;letter-spacing:inherit}
+.serif,h1,h2,h3,.logo{font-family:'Cormorant Garamond',Georgia,serif;font-weight:400}
+.ann{background:var(--fg);color:var(--bg);text-align:center;font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:9px 12px}
+header{position:sticky;top:0;z-index:20;background:#faf8f5ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--ln);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:16px 5vw}
+.logo{font-size:24px;letter-spacing:.32em;text-align:center;text-decoration:none;color:var(--fg)}
+.l{font-size:12px;letter-spacing:.18em;text-transform:uppercase}.r{display:flex;gap:22px;justify-content:flex-end;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+.hero{min-height:74vh;display:grid;place-items:center;text-align:center;padding:12vh 6vw;background:radial-gradient(ellipse at 50% 0,#efe9de,var(--bg) 70%)}
+.eyebrow{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold)}
+h1{font-size:clamp(44px,9vw,108px);line-height:1;margin:22px 0;letter-spacing:-.01em;font-weight:400}
+h1 i{color:var(--gold)}
+.hero p{max-width:420px;margin:0 auto 34px;color:var(--mut)}
+.btn{display:inline-block;background:var(--fg);color:var(--bg);padding:16px 38px;font-size:12px;letter-spacing:.24em;text-transform:uppercase;transition:.3s;border:1px solid var(--fg)}
+.btn:hover{background:transparent;color:var(--fg)}.btn:disabled{opacity:.5}
+.sec{padding:80px 5vw}.sec h2{font-size:clamp(30px,5vw,46px);text-align:center;margin:0 0 6px}
+.sub{text-align:center;color:var(--mut);font-size:13px;margin-bottom:30px}
+.f{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-bottom:44px}
+.f button{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);padding-bottom:5px;border-bottom:1px solid transparent}
+.f button.on{color:var(--fg);border-color:var(--fg)}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:28px 14px;max-width:1300px;margin:auto}
+@media(min-width:900px){.g{grid-template-columns:repeat(4,1fr);gap:48px 22px}}
+article{cursor:pointer}.im{aspect-ratio:4/5;background:var(--card);overflow:hidden;display:grid;place-items:center;font:400 64px 'Cormorant Garamond',serif;color:var(--ln)}
+.im img{width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+article:hover img{transform:scale(1.05)}
+article h3{font-size:19px;margin:14px 0 2px}article p{margin:0;font-size:13px;color:var(--mut)}article s{margin-left:6px;opacity:.6}
+.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:50px 10px;border:1px solid var(--ln)}
+.say{background:var(--card);text-align:center;padding:90px 8vw}.say p{font:400 clamp(24px,4vw,40px)/1.35 'Cormorant Garamond',serif;max-width:760px;margin:auto}
+.vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--ln);border-block:1px solid var(--ln)}
+.vals div{background:var(--bg);padding:34px 20px;text-align:center;font-size:12px;letter-spacing:.16em;text-transform:uppercase}.vals b{display:block;font:400 22px 'Cormorant Garamond',serif;letter-spacing:.04em;text-transform:none;margin-bottom:4px}
+footer{padding:50px 5vw calc(50px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--mut);font-size:12px;letter-spacing:.14em}
+.ov{position:fixed;inset:0;background:#14141466;z-index:30;opacity:0;pointer-events:none;transition:.3s}.ov.on{opacity:1;pointer-events:auto}
+.dr{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--bg);z-index:31;transform:translateX(100%);transition:.4s cubic-bezier(.2,.7,.2,1);display:flex;flex-direction:column;padding:24px}
+.dr.on{transform:none}.dr h3{font-size:24px;margin:0 0 10px}
+.row{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--ln);font-size:14px}.row .im{width:70px;aspect-ratio:4/5;font-size:24px;flex:none}.row>div:nth-child(2){flex:1}
+.q button{width:26px;height:26px;border:1px solid var(--ln)}
+.sum{margin-top:auto;font-size:14px}.sum div{display:flex;justify-content:space-between;padding:4px 0}.tot{font:400 22px 'Cormorant Garamond',serif;border-top:1px solid var(--ln);margin-top:6px;padding-top:12px!important}
+.md{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%);background:var(--bg);z-index:41;width:min(900px,94%);max-height:92vh;overflow:auto;opacity:0;pointer-events:none;transition:.3s;padding:0}.md.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.md .x{position:absolute;right:14px;top:10px;font-size:20px;z-index:2}
+.pm{display:grid;grid-template-columns:1fr}@media(min-width:760px){.pm{grid-template-columns:1fr 1fr}}
+.pi{padding:34px 28px}.pi h2{font-size:34px;margin:6px 0}.pi small,.lb{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+.pr{font-size:18px;margin-bottom:22px}.pr s{color:var(--mut);margin-left:8px;font-size:14px}.lb{margin:18px 0 10px}
+.sz{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}.sz button{min-width:52px;padding:12px 14px;border:1px solid var(--ln);font-size:13px}
+.sz button.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}.sz button:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+.pi .btn{width:100%}.note{font-size:12px;color:var(--mut);margin-top:14px}
+.box{padding:34px 28px;max-width:420px;margin:auto}.box input{width:100%;padding:13px;margin:5px 0;border:1px solid var(--ln);background:#fff;font:inherit}
+.toast{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:13px 24px;z-index:50;font-size:13px;display:none;letter-spacing:.06em}
+</style></head><body>
+<div class="ann" id="ann">Complimentary delivery across India • Secure payments by Cashfree</div>
+<header>
+<a class="l" href="#shop">Shop</a><a class="logo" href="#">404 SOCIETY</a>
+<div class="r"><button id="u" onclick="login()">Sign in</button><button onclick="openBag()">Bag (<span id="n">0</span>)</button></div>
+</header>
+<section class="hero"><div><div class="eyebrow">The Collection</div><h1>Quiet luxury,<br><i>made to be worn.</i></h1><p>Considered essentials, cut with intent. Fewer pieces, finer fabrics, made to last.</p><a class="btn" href="#shop">Explore the collection</a></div></section>
+<section class="sec" id="shop"><h2>The Edit</h2><div class="sub">Live from our atelier</div><div class="f" id="f"></div><div class="g" id="g"><div class="empty">Loading the collection…</div></div></section>
+<section class="say"><p>“Luxury is not loud. It is the quiet confidence of a perfect fit.”</p></section>
+<section class="vals"><div><b>Complimentary</b>Delivery under ₹2,000</div><div><b>Seven days</b>Easy returns</div><div><b>Secure</b>UPI • Cards • Netbanking</div><div><b>Made to last</b>Premium fabrics</div></section>
+<footer>© 2026 404 SOCIETY · ALL RIGHTS RESERVED</footer>
+<div class="ov" id="ov" onclick="closeAll()"></div>
+<aside class="dr" id="dr"><div style="display:flex;justify-content:space-between"><h3>Your Bag</h3><button onclick="closeAll()" style="font-size:20px">✕</button></div>
+<div id="items" style="overflow:auto"></div>
+<div class="sum"><div><span>Subtotal</span><span id="s1">₹0</span></div><div><span>Delivery</span><span id="s2">₹0</span></div><div class="tot"><span>Total</span><span id="s3">₹0</span></div><br><button class="btn" style="width:100%" onclick="checkout()">Checkout</button></div></aside>
+<div class="md" id="md"></div><div class="toast" id="t"></div>
+<script>
+const $=i=>document.getElementById(i),R=n=>"₹"+Number(n).toLocaleString("en-IN");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
+const api=async(p,o)=>{const r=await fetch(p,o);let d={};try{d=await r.json()}catch(e){if(r.ok)throw new Error("Not JSON")}if(!r.ok)throw new Error(d.error||"Request failed");return d};
+const post=(p,b)=>api(p,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(b||{})});
+const load=(src,ok)=>new Promise((res,rej)=>{if(ok())return res();const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+let C={threshold:2000,shipBelow:0,shipAbove:99},L=[],vm={},bag={},user=null,cat="All",CATS=["All"],sel={},cur=null;
+const toast=m=>{const t=$("t");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display="none",2800)};
+const show=h=>{$("md").innerHTML=h;$("md").classList.add("on");$("ov").classList.add("on")};
+const closeAll=()=>{["md","dr"].forEach(i=>$(i).classList.remove("on"));$("ov").classList.remove("on")};
+const img=p=>p.image?`<img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">`:`<span>${esc(p.title[0]||"")}</span>`;
+const fee=s=>!s?0:s<C.threshold?C.shipBelow:C.shipAbove;
+const sub=()=>Object.keys(bag).reduce((a,k)=>a+vm[k].v.price*bag[k],0);
+
+function grid(){
+  CATS=["All",...new Set(L.map(p=>p.category))];
+  $("f").innerHTML=CATS.map((c,i)=>`<button class="${c==cat?"on":""}" onclick="setCat(${i})">${esc(c)}</button>`).join("");
+  $("g").innerHTML=L.filter(p=>cat=="All"||p.category==cat).map(p=>`<article data-id="${esc(p.id)}" onclick="openP(this.dataset.id)"><div class="im">${img(p)}</div><h3>${esc(p.title)}</h3><p>${R(p.price)}${p.compareAt>p.price?`<s>${R(p.compareAt)}</s>`:""}</p></article>`).join("");
+}
+function setCat(i){cat=CATS[i];grid()}
+function sizes(){return cur.variants.map(v=>`<button data-v="${esc(v.id)}" ${v.available?"":"disabled"} class="${sel[cur.id]==v.id?"on":""}" onclick="pick(this.dataset.v)">${esc(v.size)}</button>`).join("")}
+function openP(id){
+  cur=L.find(p=>p.id==id);if(!cur)return;
+  const av=cur.variants.filter(v=>v.available);if(cur.variants.length==1&&av.length)sel[cur.id]=av[0].id;
+  show(`<button class="x" onclick="closeAll()">✕</button><div class="pm"><div class="im" style="aspect-ratio:auto;min-height:340px">${img(cur)}</div><div class="pi"><small>${esc(cur.category)}</small><h2>${esc(cur.title)}</h2><div class="pr">${R(cur.price)}${cur.compareAt>cur.price?`<s>${R(cur.compareAt)}</s>`:""}</div><div class="lb">Select size</div><div class="sz" id="sz">${sizes()}</div><button class="btn" onclick="addB()">Add to bag</button><p class="note">Complimentary delivery on orders below ${R(C.threshold)}. Easy 7-day returns.</p></div></div>`);
+}
+function pick(v){sel[cur.id]=v;$("sz").innerHTML=sizes()}
+function addB(){const v=sel[cur.id];if(!v)return toast("Please select a size");bag[v]=(bag[v]||0)+1;draw();closeAll();openBag()}
+function chg(k,d){bag[k]+=d;if(bag[k]<1)delete bag[k];draw()}
+function openBag(){$("dr").classList.add("on");$("ov").classList.add("on")}
+function draw(){
+  const k=Object.keys(bag);$("n").textContent=k.reduce((a,i)=>a+bag[i],0);
+  $("items").innerHTML=k.length?k.map(id=>{const{p,v}=vm[id];return`<div class="row"><div class="im">${img(p)}</div><div><span class="serif" style="font-size:18px">${esc(p.title)}</span><br><small style="color:var(--mut)">Size: ${esc(v.size)}</small><br>${R(v.price)}</div><div class="q"><button onclick="chg('${id}',-1)">−</button> ${bag[id]} <button onclick="chg('${id}',1)">+</button></div></div>`}).join(""):'<p style="color:var(--mut)">Your bag is empty.</p>';
+  const t=sub(),s=fee(t);$("s1").textContent=R(t);$("s2").textContent=s?R(s):"Complimentary";$("s3").textContent=R(t+s);
+}
+/* ---- Google sign-in ---- */
+function setUser(u){user=u;$("u").textContent=u?"Hi, "+u.name.split(" ")[0]:"Sign in"}
+async function login(){
+  if(user){await post("/api/auth/logout");setUser(null);return toast("Signed out")}
+  show('<div class="box"><h2 class="serif" style="font-size:30px;margin:0 0 6px">Welcome</h2><p style="color:var(--mut);font-size:14px">Sign in with your Google account to shop.</p><div id="gb" style="display:flex;justify-content:center;margin-top:18px"></div></div>');
+  if(!C.googleClientId)return $("gb").innerHTML='<small style="color:#a33">Google login is not configured yet.</small>';
+  try{await load("https://accounts.google.com/gsi/client",()=>window.google&&google.accounts);
+  google.accounts.id.initialize({client_id:C.googleClientId,callback:async r=>{try{setUser(await post("/api/auth/google",{credential:r.credential}));closeAll();toast("Signed in")}catch(e){toast(e.message)}}});
+  google.accounts.id.renderButton($("gb"),{theme:"outline",size:"large",text:"continue_with"})}catch(e){toast("Could not load Google sign-in")}
+}
+/* ---- Checkout: delivery details -> Cashfree ---- */
+const F=[["name","Full name"],["phone","Mobile (10 digits)"],["address1","Address"],["city","City"],["state","State"],["pincode","PIN code"]];
+function checkout(){
+  if(!Object.keys(bag).length)return toast("Your bag is empty");
+  if(!user){closeAll();return login()}
+  const t=sub(),tot=t+fee(t);
+  show(`<div class="box"><h2 class="serif" style="font-size:30px;margin:0 0 12px">Delivery</h2>${F.map(([k,l])=>`<input id="ck_${k}" placeholder="${l}" autocomplete="off">`).join("")}<br><br><button class="btn" id="go" style="width:100%">Pay ${R(tot)} with Cashfree</button><button onclick="closeAll()" style="width:100%;margin-top:12px;font-size:12px;color:var(--mut)">Cancel</button></div>`);
+  $("go").onclick=async()=>{const a={};F.forEach(([k])=>a[k]=$("ck_"+k).value.trim());$("go").disabled=true;
+    try{const o=await post("/api/checkout",{items:Object.keys(bag).map(id=>({variantId:id,qty:bag[id]})),address:a});
+      await load("https://sdk.cashfree.com/js/v3/cashfree.js",()=>window.Cashfree);
+      Cashfree({mode:C.cashfreeMode}).checkout({paymentSessionId:o.payment_session_id,redirectTarget:"_self"})}
+    catch(e){toast(e.message);$("go").disabled=false}};
+}
+/* ---- Boot ---- */
+(async()=>{
+  const note=m=>$("g").innerHTML=`<div class="empty">${esc(m)}</div>`;let step="/api/config";
+  try{C=await api(step);step="/api/products";L=(await api(step)).products}
+  catch(e){return note(step=="/api/config"?"The store is not connected yet — deploy the Worker (src/worker.js and wrangler.jsonc).":"Shopify did not respond: "+e.message+". Check SHOPIFY_DOMAIN and SHOPIFY_STOREFRONT_TOKEN.")}
+  $("ann").textContent=`Complimentary delivery on orders below ${R(C.threshold)} • Secure payments by Cashfree`;
+  if(!L.length)return note("No products yet. In Shopify, set products to Active and make them available to your Storefront API token.");
+  L.forEach(p=>p.variants.forEach(v=>vm[v.id]={p,v}));grid();draw();
+  try{setUser(await api("/api/me"))}catch(e){}
+  const oid=new URLSearchParams(location.search).get("order_id");
+  if(oid){history.replaceState(null,"",location.pathname);toast("Confirming your payment…");let n=0;
+    const poll=async()=>{try{const s=await api("/api/order-status?order_id="+encodeURIComponent(oid));
+      if(s.status=="PAID"){bag={};draw();return toast("Thank you — your order is confirmed")}
+      if(s.status=="ACTIVE"&&++n<6)return setTimeout(poll,3000);toast("Payment "+String(s.status).toLowerCase())}catch(e){toast(e.message)}};poll()}
+})();
+</script></body></html>
