@@ -18,7 +18,7 @@
   "vars": {
     "SHOPIFY_DOMAIN": "CHANGE-ME.myshopify.com",
     "GOOGLE_CLIENT_ID": "CHANGE-ME.apps.googleusercontent.com",
-    "CASHFREE_ENV": "sandbox",
+    "CASHFREE_ENV": "production",
     "SHIP_THRESHOLD": "2000",
     "SHIP_BELOW": "0",
     "SHIP_ABOVE": "99"
