@@ -154,3 +154,34 @@ test("shopifyOrder builds a paid order with address", () => {
   const o = shopifyOrder({ lines: [{ variantId: VID, qty: 1 }], address: ADDR, email: "a@b.com", shipping: 0, total: 1299 }, "404_x").order;
   assert.equal(o.shipping_address.first_name, "Asha"); assert.equal(o.shipping_address.last_name, "Rao"); assert.equal(o.transactions[0].amount, "1299.00");
 });
+
+test("clear setup errors instead of a vague server error", async () => {
+  let r = await call(mkEnv({ SHOPIFY_STOREFRONT_TOKEN: "" }), "/api/products");
+  assert.equal(r.status, 500); assert.match((await r.json()).error, /SHOPIFY_STOREFRONT_TOKEN/);
+  r = await call(mkEnv({ SHOPIFY_DOMAIN: "CHANGE-ME.myshopify.com" }), "/api/products");
+  assert.match((await r.json()).error, /SHOPIFY_DOMAIN/);
+  stubFetch(() => jr({}, 401));
+  r = await call(mkEnv(), "/api/products");
+  assert.equal(r.status, 502); assert.match((await r.json()).error, /Storefront token/);
+  globalThis.fetch = async () => { throw new TypeError("fetch failed"); };
+  assert.match((await (await call(mkEnv(), "/api/products")).json()).error, /Could not reach Shopify/);
+});
+
+test("cashfree and login setup errors are explained", async () => {
+  const env = mkEnv(); const h = await authed(env);
+  stubFetch((u) => u.includes("graphql") ? jr(variantNode(1299)) : jr({ message: "authentication Failed" }, 401));
+  let r = await call(env, "/api/checkout", post({ items: [{ variantId: VID, qty: 1 }], address: ADDR }, h));
+  assert.equal(r.status, 502); assert.match((await r.json()).error, /Cashfree: authentication Failed/);
+  r = await call(mkEnv({ CASHFREE_CLIENT_SECRET: "" }), "/api/checkout", post({ items: [{ variantId: VID, qty: 1 }], address: ADDR }, h));
+  assert.match((await r.json()).error, /CASHFREE_CLIENT_SECRET/);
+  r = await call(mkEnv({ GOOGLE_CLIENT_ID: "" }), "/api/auth/google", post({ credential: "x" }));
+  assert.match((await r.json()).error, /GOOGLE_CLIENT_ID/);
+});
+
+test("/api/health reports missing settings without leaking values", async () => {
+  const r = await call(mkEnv({ SESSION_SECRET: "", SHOPIFY_DOMAIN: "CHANGE-ME.myshopify.com" }), "/api/health");
+  const d = await r.json(), txt = JSON.stringify(d);
+  assert.equal(d.SESSION_SECRET, false); assert.equal(d.SHOPIFY_DOMAIN, false); assert.equal(d.CASHFREE_CLIENT_SECRET, true); assert.equal(d.ORDERS_binding, true);
+  assert.ok(!txt.includes("csecret") && !txt.includes("adm") && !txt.includes("gid-client"));
+});
+     
