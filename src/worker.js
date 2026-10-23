@@ -89,15 +89,24 @@ export function shopifyOrder(rec, id) {
 /* ---------- Shopify ---------- */
 const Q_PRODUCTS = `{products(first:50){nodes{id title productType featuredImage{url} variants(first:30){nodes{id title availableForSale price{amount} compareAtPrice{amount} selectedOptions{name value}}}}}}`;
 const Q_VARIANTS = `query($ids:[ID!]!){nodes(ids:$ids){... on ProductVariant{id availableForSale price{amount} product{title}}}}`;
+function need(env, ...names) {
+  for (const n of names) if (!env[n] || /CHANGE-ME/.test(env[n])) throw new HttpError(500, `Setup missing: ${n} is not set in Cloudflare`);
+}
 async function storefront(env, query, variables) {
-  const r = await fetch(`https://${env.SHOPIFY_DOMAIN}/api/${SV(env)}/graphql.json`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "X-Shopify-Storefront-Access-Token": env.SHOPIFY_STOREFRONT_TOKEN },
-    body: JSON.stringify({ query, variables }),
-  });
-  if (!r.ok) throw new Error("shopify " + r.status);
+  need(env, "SHOPIFY_DOMAIN", "SHOPIFY_STOREFRONT_TOKEN");
+  let r;
+  try {
+    r = await fetch(`https://${env.SHOPIFY_DOMAIN}/api/${SV(env)}/graphql.json`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "X-Shopify-Storefront-Access-Token": env.SHOPIFY_STOREFRONT_TOKEN },
+      body: JSON.stringify({ query, variables }),
+    });
+  } catch { throw new HttpError(502, "Could not reach Shopify. SHOPIFY_DOMAIN must look like your-store.myshopify.com"); }
+  if (r.status === 401 || r.status === 403) throw new HttpError(502, "Shopify rejected the Storefront token. Check SHOPIFY_STOREFRONT_TOKEN");
+  if (r.status === 404) throw new HttpError(502, "Shopify store not found. Check SHOPIFY_DOMAIN");
+  if (!r.ok) throw new HttpError(502, "Shopify error " + r.status);
   const j = await r.json();
-  if (j.errors) throw new Error("shopify graphql");
+  if (j.errors) throw new HttpError(502, "Shopify query error. Give the app Storefront API access to products");
   return j.data;
 }
 async function priceItems(env, items) {
@@ -119,6 +128,8 @@ const cfBase = (env) => (env.CASHFREE_ENV === "production" ? "https://api.cashfr
 const cfHeaders = (env) => ({ "content-type": "application/json", "x-api-version": "2023-08-01", "x-client-id": env.CASHFREE_CLIENT_ID, "x-client-secret": env.CASHFREE_CLIENT_SECRET });
 
 async function checkout(req, env, sess) {
+  need(env, "CASHFREE_CLIENT_ID", "CASHFREE_CLIENT_SECRET");
+  if (!env.ORDERS) throw new HttpError(500, "Setup missing: ORDERS storage binding");
   const b = await req.json().catch(() => null);
   const items = cleanItems(b && b.items), addr = validAddress(b && b.address);
   if (!items || !addr) throw new HttpError(400, "Invalid bag or delivery details");
@@ -135,7 +146,7 @@ async function checkout(req, env, sess) {
       order_meta: { return_url: origin + "/?order_id={order_id}", notify_url: origin + "/api/cashfree/webhook" },
     }),
   });
-  if (!r.ok) throw new HttpError(502, "Payment provider error");
+  if (!r.ok) { const m = await r.json().catch(() => ({})); throw new HttpError(502, "Cashfree: " + (m.message || "request failed (" + r.status + ")")); }
   const o = await r.json();
   await env.ORDERS.put("order:" + orderId, JSON.stringify({ lines, address: addr, email: sess.email, subtotal, shipping, total, status: "pending" }), { expirationTtl: 2592000 });
   return J({ order_id: orderId, payment_session_id: o.payment_session_id, total, shipping });
@@ -183,10 +194,13 @@ async function orderStatus(url, env, sess) {
 
 /* ---------- Google login ---------- */
 async function googleLogin(req, env) {
+  need(env, "GOOGLE_CLIENT_ID", "SESSION_SECRET");
   const b = await req.json().catch(() => null);
   const c = b && b.credential;
   if (typeof c !== "string" || c.length > 4096) throw new HttpError(400, "Bad credential");
-  const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(c));
+  let r;
+  try { r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(c)); }
+  catch { throw new HttpError(502, "Could not reach Google to verify your sign-in. Try again"); }
   if (!r.ok) throw new HttpError(401, "Invalid Google token");
   const t = await r.json();
   if (!env.GOOGLE_CLIENT_ID || t.aud !== env.GOOGLE_CLIENT_ID || String(t.email_verified) !== "true" || !/^(https:\/\/)?accounts\.google\.com$/.test(t.iss) || !(+t.exp > Date.now() / 1000)) throw new HttpError(401, "Invalid Google token");
@@ -204,6 +218,10 @@ export default {
       if (p === "/api/cashfree/webhook" && POST) return await webhook(req, env);
       const origin = req.headers.get("origin");
       if (POST && origin && origin !== url.origin) throw new HttpError(403, "Bad origin");
+      if (p === "/api/health" && GET) { // shows which settings exist (yes/no only, never the values)
+        const has = (k) => !!env[k] && !/CHANGE-ME/.test(env[k]);
+        return J({ version: "diag-2", SHOPIFY_DOMAIN: has("SHOPIFY_DOMAIN"), SHOPIFY_STOREFRONT_TOKEN: has("SHOPIFY_STOREFRONT_TOKEN"), SHOPIFY_ADMIN_TOKEN: has("SHOPIFY_ADMIN_TOKEN"), GOOGLE_CLIENT_ID: has("GOOGLE_CLIENT_ID"), CASHFREE_CLIENT_ID: has("CASHFREE_CLIENT_ID"), CASHFREE_CLIENT_SECRET: has("CASHFREE_CLIENT_SECRET"), SESSION_SECRET: has("SESSION_SECRET"), ORDERS_binding: !!env.ORDERS, CASHFREE_ENV: env.CASHFREE_ENV || "not set" });
+      }
       if (p === "/api/config" && GET) return J({ googleClientId: env.GOOGLE_CLIENT_ID || "", cashfreeMode: env.CASHFREE_ENV === "production" ? "production" : "sandbox", threshold: num(env.SHIP_THRESHOLD, 2000), shipBelow: num(env.SHIP_BELOW, 0), shipAbove: num(env.SHIP_ABOVE, 99) });
       if (p === "/api/products" && GET) return J({ products: normalizeProducts(await storefront(env, Q_PRODUCTS, {})) }, 200, { "cache-control": "public, max-age=60" });
       const sess = await verifySession(cookie(req, "sid"), env.SESSION_SECRET);
@@ -221,3 +239,4 @@ export default {
     }
   },
 };
+                             
