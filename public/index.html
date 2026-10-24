@@ -50,6 +50,7 @@ footer{padding:50px 5vw calc(50px + env(safe-area-inset-bottom,0px));text-align:
 .pr{font-size:18px;margin-bottom:22px}.pr s{color:var(--mut);margin-left:8px;font-size:14px}.lb{margin:18px 0 10px}
 .sz{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}.sz button{min-width:52px;padding:12px 14px;border:1px solid var(--ln);font-size:13px}
 .sz button.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}.sz button:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+.sw{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px}.sw button{width:30px;height:30px;border-radius:50%;border:1px solid var(--ln);box-shadow:inset 0 0 0 3px var(--bg)}.sw button.on{outline:1px solid var(--fg);outline-offset:3px}.sw button.t{width:auto;height:auto;border-radius:0;padding:8px 14px;font-size:12px;box-shadow:none}.sw button.t.on{background:var(--fg);color:var(--bg);outline:0}.dots{display:flex;gap:5px;margin-top:8px}.dots i{width:11px;height:11px;border-radius:50%;border:1px solid var(--ln)}
 .pi .btn{width:100%}.note{font-size:12px;color:var(--mut);margin-top:14px}
 .box{padding:34px 28px;max-width:420px;margin:auto}.box input{width:100%;padding:13px;margin:5px 0;border:1px solid var(--ln);background:#fff;font:inherit}
 .toast{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:13px 24px;z-index:50;font-size:13px;display:none;letter-spacing:.06em}
@@ -86,22 +87,34 @@ const sub=()=>Object.keys(bag).reduce((a,k)=>a+vm[k].v.price*bag[k],0);
 function grid(){
   CATS=["All",...new Set(L.map(p=>p.category))];
   $("f").innerHTML=CATS.map((c,i)=>`<button class="${c==cat?"on":""}" onclick="setCat(${i})">${esc(c)}</button>`).join("");
-  $("g").innerHTML=L.filter(p=>cat=="All"||p.category==cat).map(p=>`<article data-id="${esc(p.id)}" onclick="openP(this.dataset.id)"><div class="im">${img(p)}</div><h3>${esc(p.title)}</h3><p>${R(p.price)}${p.compareAt>p.price?`<s>${R(p.compareAt)}</s>`:""}</p></article>`).join("");
+  $("g").innerHTML=L.filter(p=>cat=="All"||p.category==cat).map(p=>`<article data-id="${esc(p.id)}" onclick="openP(this.dataset.id)"><div class="im">${img(p)}</div><h3>${esc(p.title)}</h3><p>${R(p.price)}${p.compareAt>p.price?`<s>${R(p.compareAt)}</s>`:""}</p>${dots(p)}</article>`).join("");
 }
 function setCat(i){cat=CATS[i];grid()}
-function sizes(){return cur.variants.map(v=>`<button data-v="${esc(v.id)}" ${v.available?"":"disabled"} class="${sel[cur.id]==v.id?"on":""}" onclick="pick(this.dataset.v)">${esc(v.size)}</button>`).join("")}
+const NH={black:"#141414",white:"#f6f4ef",ivory:"#f3eee2",cream:"#efe6d2",beige:"#d8c8aa",sand:"#d9c7a3",tan:"#b98d5e",brown:"#6b4a35",camel:"#c19a6b",grey:"#9a9a9a",gray:"#9a9a9a",charcoal:"#3a3a3c",navy:"#1f2a44",blue:"#2f5fa8",sky:"#8fb8e0",green:"#3f6b4f",olive:"#6b6b3a",khaki:"#b3a46b",red:"#b3262b",maroon:"#6d1f2b",burgundy:"#6d1f2b",pink:"#e4a3b4",rose:"#d98c9c",purple:"#6a4c93",lavender:"#b9a7d6",yellow:"#e3c24a",mustard:"#c9a227",orange:"#d9772b",gold:"#b8985a",silver:"#c4c4c4",multicolor:"conic-gradient(#b3262b,#e3c24a,#3f6b4f,#2f5fa8,#b3262b)"};
+const hexOf=c=>{if(c.hex)return c.hex;const k=String(c.name).toLowerCase().replace(/[^a-z ]/g,"").trim();return NH[k.replace(/ /g,"")]||NH[k.split(" ").pop()]||""};
+const dots=p=>p.colors&&p.colors.length>1?`<div class="dots">${p.colors.slice(0,6).map(c=>`<i title="${esc(c.name)}" style="background:${esc(hexOf(c)||"#ccc")}"></i>`).join("")}</div>`:"";
+let sc="",ss="";
+const cols=()=>cur.colors||[];
+const colVs=()=>cur.variants.filter(v=>v.color===sc);
+const vFor=()=>cur.variants.find(v=>v.color===sc&&v.size===ss);
+function swatches(){return cols().map(c=>{const h=hexOf(c),ok=cur.variants.some(v=>v.color===c.name&&v.available);return`<button data-c="${esc(c.name)}" title="${esc(c.name)}" class="${c.name===sc?"on":""} ${h?"":"t"}" ${h?`style="background:${esc(h)}${ok?"":";opacity:.35"}"`:""} onclick="pickC(this.dataset.c)">${h?"":esc(c.name)}</button>`}).join("")}
+function sizes(){return colVs().map(v=>`<button data-s="${esc(v.size)}" ${v.available?"":"disabled"} class="${v.size===ss?"on":""}" onclick="pickS(this.dataset.s)">${esc(v.size)}</button>`).join("")}
+function imgFor(){const v=colVs().find(v=>v.image);return v?{...cur,image:v.image}:cur}
+function autoSize(){const a=colVs().filter(v=>v.available);ss=colVs().length==1&&a.length?a[0].size:(a.some(v=>v.size===ss)?ss:"")}
+function paint(){$("cn").textContent=sc;$("sw").innerHTML=swatches();$("sz").innerHTML=sizes();$("pim").innerHTML=img(imgFor())}
+function pickC(c){sc=c;autoSize();paint()}
+function pickS(s){ss=s;$("sz").innerHTML=sizes()}
 function openP(id){
   cur=L.find(p=>p.id==id);if(!cur)return;
-  const av=cur.variants.filter(v=>v.available);if(cur.variants.length==1&&av.length)sel[cur.id]=av[0].id;
-  show(`<button class="x" onclick="closeAll()">✕</button><div class="pm"><div class="im" style="aspect-ratio:auto;min-height:340px">${img(cur)}</div><div class="pi"><small>${esc(cur.category)}</small><h2>${esc(cur.title)}</h2><div class="pr">${R(cur.price)}${cur.compareAt>cur.price?`<s>${R(cur.compareAt)}</s>`:""}</div><div class="lb">Select size</div><div class="sz" id="sz">${sizes()}</div><button class="btn" onclick="addB()">Add to bag</button><p class="note">Complimentary delivery on orders below ${R(C.threshold)}. Easy 7-day returns.</p></div></div>`);
+  const c0=cols().find(c=>cur.variants.some(v=>v.color===c.name&&v.available))||cols()[0];sc=c0?c0.name:"";ss="";autoSize();
+  show(`<button class="x" onclick="closeAll()">✕</button><div class="pm"><div class="im" id="pim" style="aspect-ratio:auto;min-height:340px">${img(imgFor())}</div><div class="pi"><small>${esc(cur.category)}</small><h2>${esc(cur.title)}</h2><div class="pr">${R(cur.price)}${cur.compareAt>cur.price?`<s>${R(cur.compareAt)}</s>`:""}</div>${cols().length?`<div class="lb">Colour — <span id="cn">${esc(sc)}</span></div><div class="sw" id="sw">${swatches()}</div>`:'<span id="cn" hidden></span><div id="sw" hidden></div>'}<div class="lb">Select size</div><div class="sz" id="sz">${sizes()}</div><button class="btn" onclick="addB()">Add to bag</button><p class="note">Complimentary delivery on orders below ${R(C.threshold)}. Easy 7-day returns.</p></div></div>`);
 }
-function pick(v){sel[cur.id]=v;$("sz").innerHTML=sizes()}
-function addB(){const v=sel[cur.id];if(!v)return toast("Please select a size");bag[v]=(bag[v]||0)+1;draw();closeAll();openBag()}
+function addB(){if(cols().length&&!sc)return toast("Please select a colour");const v=vFor();if(!ss||!v)return toast("Please select a size");if(!v.available)return toast("Sorry, that option is sold out");bag[v.id]=(bag[v.id]||0)+1;draw();closeAll();openBag()}
 function chg(k,d){bag[k]+=d;if(bag[k]<1)delete bag[k];draw()}
 function openBag(){$("dr").classList.add("on");$("ov").classList.add("on")}
 function draw(){
   const k=Object.keys(bag);$("n").textContent=k.reduce((a,i)=>a+bag[i],0);
-  $("items").innerHTML=k.length?k.map(id=>{const{p,v}=vm[id];return`<div class="row"><div class="im">${img(p)}</div><div><span class="serif" style="font-size:18px">${esc(p.title)}</span><br><small style="color:var(--mut)">Size: ${esc(v.size)}</small><br>${R(v.price)}</div><div class="q"><button onclick="chg('${id}',-1)">−</button> ${bag[id]} <button onclick="chg('${id}',1)">+</button></div></div>`}).join(""):'<p style="color:var(--mut)">Your bag is empty.</p>';
+  $("items").innerHTML=k.length?k.map(id=>{const{p,v}=vm[id];return`<div class="row"><div class="im">${img(p)}</div><div><span class="serif" style="font-size:18px">${esc(p.title)}</span><br><small style="color:var(--mut)">${v.color?esc(v.color)+" · ":""}Size: ${esc(v.size)}</small><br>${R(v.price)}</div><div class="q"><button onclick="chg('${id}',-1)">−</button> ${bag[id]} <button onclick="chg('${id}',1)">+</button></div></div>`}).join(""):'<p style="color:var(--mut)">Your bag is empty.</p>';
   const t=sub(),s=fee(t);$("s1").textContent=R(t);$("s2").textContent=s?R(s):"Complimentary";$("s3").textContent=R(t+s);
 }
 /* ---- Google sign-in ---- */
