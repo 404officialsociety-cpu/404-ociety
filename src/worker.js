@@ -43,10 +43,14 @@ export async function verifyCashfreeSignature(raw, ts, sig, secret) {
 }
 export function normalizeProducts(d) {
   return ((d && d.products && d.products.nodes) || []).map((p) => {
+    const co = (p.options || []).find((o) => /colou?r/i.test(o.name));
+    const hexBy = {};
+    ((co && co.optionValues) || []).forEach((x) => { if (x.swatch && x.swatch.color) hexBy[x.name] = x.swatch.color; });
     const vs = p.variants.nodes.map((v) => {
-      const o = v.selectedOptions.find((x) => /size/i.test(x.name));
-      const size = o ? o.value : v.title;
-      return { id: v.id, size: size === "Default Title" ? "One size" : size, price: +v.price.amount, compareAt: v.compareAtPrice ? +v.compareAtPrice.amount : 0, available: !!v.availableForSale };
+      const so = v.selectedOptions || [];
+      const o = so.find((x) => /size/i.test(x.name)), c = so.find((x) => /colou?r/i.test(x.name));
+      const size = o ? o.value : (v.title === "Default Title" || c ? "One size" : v.title);
+      return { id: v.id, size: size === "Default Title" ? "One size" : size, color: c ? c.value : "", image: (v.image && v.image.url) || "", price: +v.price.amount, compareAt: v.compareAtPrice ? +v.compareAtPrice.amount : 0, available: !!v.availableForSale };
     });
     const avail = vs.filter((v) => v.available);
     return {
@@ -54,6 +58,7 @@ export function normalizeProducts(d) {
       image: (p.featuredImage && p.featuredImage.url) || "",
       price: Math.min(...(avail.length ? avail : vs).map((v) => v.price)),
       compareAt: Math.max(0, ...vs.map((v) => v.compareAt)), variants: vs,
+      colors: [...new Set(vs.map((v) => v.color).filter(Boolean))].map((name) => ({ name, hex: hexBy[name] || "" })),
     };
   }).filter((p) => p.variants.length);
 }
@@ -87,7 +92,7 @@ export function shopifyOrder(rec, id) {
 }
 
 /* ---------- Shopify ---------- */
-const Q_PRODUCTS = `{products(first:50){nodes{id title productType featuredImage{url} variants(first:30){nodes{id title availableForSale price{amount} compareAtPrice{amount} selectedOptions{name value}}}}}}`;
+const Q_PRODUCTS = `{products(first:50){nodes{id title productType featuredImage{url} options{name optionValues{name swatch{color}}} variants(first:100){nodes{id title availableForSale image{url} price{amount} compareAtPrice{amount} selectedOptions{name value}}}}}}`;
 const Q_VARIANTS = `query($ids:[ID!]!){nodes(ids:$ids){... on ProductVariant{id availableForSale price{amount} product{title}}}}`;
 function need(env, ...names) {
   for (const n of names) if (!env[n] || /CHANGE-ME/.test(env[n])) throw new HttpError(500, `Setup missing: ${n} is not set in Cloudflare`);
@@ -239,4 +244,3 @@ export default {
     }
   },
 };
-                             
