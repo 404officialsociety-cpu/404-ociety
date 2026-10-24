@@ -184,4 +184,19 @@ test("/api/health reports missing settings without leaking values", async () => 
   assert.equal(d.SESSION_SECRET, false); assert.equal(d.SHOPIFY_DOMAIN, false); assert.equal(d.CASHFREE_CLIENT_SECRET, true); assert.equal(d.ORDERS_binding, true);
   assert.ok(!txt.includes("csecret") && !txt.includes("adm") && !txt.includes("gid-client"));
 });
-     
+
+test("normalizeProducts keeps colours, swatches and colour photos in sync", () => {
+  const node = (id, color, size, img, ok = true) => ({ id, title: color + " / " + size, availableForSale: ok, image: img ? { url: img } : null, price: { amount: "1500.0" }, compareAtPrice: null, selectedOptions: [{ name: "Color", value: color }, { name: "Size", value: size }] });
+  const [p] = normalizeProducts({ products: { nodes: [{ id: "p1", title: "Coat", productType: "Women", featuredImage: { url: "f.jpg" },
+    options: [{ name: "Color", optionValues: [{ name: "Black", swatch: { color: "#000000" } }, { name: "Sand", swatch: null }] }, { name: "Size", optionValues: [] }],
+    variants: { nodes: [node("a", "Black", "S", "b.jpg"), node("b", "Black", "M", "b.jpg", false), node("c", "Sand", "S", "s.jpg")] } }] } });
+  assert.deepEqual(p.colors, [{ name: "Black", hex: "#000000" }, { name: "Sand", hex: "" }]);
+  assert.equal(p.variants[0].color, "Black"); assert.equal(p.variants[0].size, "S"); assert.equal(p.variants[2].image, "s.jpg");
+  assert.equal(p.variants[1].available, false);
+});
+
+test("colour-only product shows One size", () => {
+  const [p] = normalizeProducts({ products: { nodes: [{ id: "p", title: "Cap", productType: "", featuredImage: null, options: [],
+    variants: { nodes: [{ id: "v", title: "Navy", availableForSale: true, price: { amount: "9" }, compareAtPrice: null, selectedOptions: [{ name: "Colour", value: "Navy" }] }] } }] } });
+  assert.equal(p.variants[0].size, "One size"); assert.equal(p.variants[0].color, "Navy");
+});
